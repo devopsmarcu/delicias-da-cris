@@ -154,7 +154,16 @@ export class UI {
         <div class="controls-wrapper">
           <div class="main-controls">
             <button class="ctrl-btn minus" data-id="${item.id}" aria-label="Remover 1" ${qty === 0 ? 'disabled' : ''}>−</button>
-            <span class="qty-display" id="qty-${item.id}">${qty}</span>
+            <input
+              type="number"
+              class="qty-input"
+              id="qty-${item.id}"
+              data-id="${item.id}"
+              value="${qty}"
+              min="0"
+              inputmode="numeric"
+              aria-label="Quantidade de ${item.name}"
+            />
             <button class="ctrl-btn plus" data-id="${item.id}" aria-label="Adicionar 1">+</button>
           </div>
           <div class="quick-controls">
@@ -179,6 +188,12 @@ export class UI {
   attachItemControls() {
     if (!this.menuContainer) return;
 
+    // Abort previous listeners to avoid stacking on re-renders
+    if (this._menuAbortCtrl) this._menuAbortCtrl.abort();
+    this._menuAbortCtrl = new AbortController();
+    const signal = this._menuAbortCtrl.signal;
+
+    // Button clicks (+ / - / quick buttons)
     this.menuContainer.addEventListener('click', (e) => {
       const btn = e.target.closest('button[data-id]');
       if (!btn) return;
@@ -197,7 +212,25 @@ export class UI {
         const qty = parseInt(btn.dataset.qty, 10);
         this.cart.removeItem(id, qty);
       }
-    });
+    }, { signal });
+
+    // Manual input: 'change' fires on blur or Enter
+    this.menuContainer.addEventListener('change', (e) => {
+      const input = e.target.closest('input.qty-input[data-id]');
+      if (!input) return;
+
+      const id = input.dataset.id;
+      const itemData = this.findItemData(id);
+      const newQty = parseInt(input.value, 10);
+
+      if (isNaN(newQty) || newQty < 0) {
+        // Reset to current cart value if invalid
+        input.value = this.cart.getQuantity(id);
+        return;
+      }
+
+      this.cart.setQuantity(id, newQty, itemData);
+    }, { signal });
   }
 
   findItemData(id) {
@@ -215,17 +248,20 @@ export class UI {
   }
 
   refreshItemQuantities(updatedCart) {
-    // Update only visible qty displays and subtotals — no full re-render
+    // Update only visible elements — no full re-render
     menuData.forEach(cat => {
       cat.items.forEach(item => {
-        const qtyEl = document.getElementById(`qty-${item.id}`);
+        const qtyInput = document.getElementById(`qty-${item.id}`);
         const subtotalEl = document.getElementById(`subtotal-${item.id}`);
         const minusBtn = this.menuContainer?.querySelector(`.minus[data-id="${item.id}"]`);
         const quickMinusBtns = this.menuContainer?.querySelectorAll(`.quick-minus[data-id="${item.id}"]`);
 
         const qty = updatedCart.getQuantity(item.id);
 
-        if (qtyEl) qtyEl.textContent = qty;
+        // Only update the input if the user isn't actively typing in it
+        if (qtyInput && document.activeElement !== qtyInput) {
+          qtyInput.value = qty;
+        }
 
         if (subtotalEl) {
           if (qty > 0) {

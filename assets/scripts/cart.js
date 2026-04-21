@@ -47,6 +47,23 @@ export class Cart {
     }
   }
 
+  /**
+   * Define a quantidade diretamente (usado no input manual).
+   * Se newQty <= 0, o item é removido do carrinho.
+   */
+  setQuantity(itemId, newQty, itemData) {
+    const qty = Math.max(0, Math.floor(newQty));
+    if (qty === 0) {
+      this.items.delete(itemId);
+    } else if (this.items.has(itemId)) {
+      this.items.get(itemId).quantity = qty;
+    } else if (itemData) {
+      this.items.set(itemId, { ...itemData, quantity: qty });
+    }
+    this.saveToStorage();
+    this.triggerUpdate();
+  }
+
   clear() {
     this.items.clear();
     this.saveToStorage();
