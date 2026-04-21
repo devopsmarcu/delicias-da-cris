@@ -1,104 +1,202 @@
 import { menuData } from './menu.js';
 import { generateWhatsAppLink } from './whatsapp.js';
 
+const CATEGORY_ICONS = {
+  'simples': '🥟',
+  'especiais': '⭐',
+  'tortas-salgadas': '🥧',
+  'bolos-simples': '🍰',
+  'bolos-cobertura': '🎂',
+  'paes-forno': '🍞',
+};
+
 export class UI {
   constructor(cart) {
     this.cart = cart;
     this.menuContainer = document.getElementById('menu-container');
-    this.categoryNav = document.getElementById('category-nav');
-    this.cartFab = document.getElementById('cart-fab');
     this.cartModal = document.getElementById('cart-modal');
     this.cartItemsList = document.getElementById('cart-items-list');
     this.cartTotalEl = document.getElementById('cart-total');
     this.cartBadge = document.getElementById('cart-badge');
+    this.cartFab = document.getElementById('cart-fab');
     this.closeCartBtn = document.getElementById('close-cart-btn');
     this.clearCartBtn = document.getElementById('clear-cart-btn');
     this.checkoutBtn = document.getElementById('checkout-btn');
+    this.headerCategory = document.getElementById('header-category');
 
-    this.cart.onUpdate((updatedCart) => this.updateCartUI(updatedCart));
-    this.init();
-  }
-
-  init() {
-    this.renderCategoryNav();
-    this.renderMenu();
-    this.setupEventListeners();
+    this.cart.onUpdate((updatedCart) => this.onCartUpdate(updatedCart));
+    this.setupGlobalListeners();
+    this.render();
     this.updateCartUI(this.cart);
   }
 
-  renderCategoryNav() {
-    if (!this.categoryNav) return;
-    this.categoryNav.innerHTML = '';
-    menuData.forEach(category => {
-      const btn = document.createElement('button');
-      btn.className = 'nav-pill';
-      btn.textContent = category.title;
-      btn.onclick = () => {
-        document.getElementById(`cat-${category.id}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
-      };
-      this.categoryNav.appendChild(btn);
+  // ─── Routing ───────────────────────────────────────────────
+  getRoute() {
+    const hash = window.location.hash.replace('#', '').trim();
+    return hash || 'home';
+  }
+
+  render() {
+    const route = this.getRoute();
+    this.updateActiveNav(route);
+
+    if (route === 'home') {
+      this.renderHome();
+      if (this.headerCategory) this.headerCategory.textContent = 'Cardápio';
+    } else {
+      const category = menuData.find(c => c.id === route);
+      if (category) {
+        this.renderCategory(category);
+        if (this.headerCategory) this.headerCategory.textContent = category.title;
+      } else {
+        this.renderHome();
+        if (this.headerCategory) this.headerCategory.textContent = 'Cardápio';
+      }
+    }
+  }
+
+  updateActiveNav(route) {
+    document.querySelectorAll('.nav-item[data-route]').forEach(el => {
+      el.classList.toggle('active', el.dataset.route === route);
     });
   }
 
-  renderMenu() {
+  // ─── Home Screen ───────────────────────────────────────────
+  renderHome() {
     if (!this.menuContainer) return;
-    this.menuContainer.innerHTML = '';
-    
-    menuData.forEach(category => {
-      const section = document.createElement('section');
-      section.id = `cat-${category.id}`;
-      section.setAttribute('aria-labelledby', `heading-${category.id}`);
-      
-      let html = `
-        <h2 id="heading-${category.id}"><span class="h2-icon" aria-hidden="true"></span> ${category.title}</h2>
-        <div class="h2-rule"></div>
-        <ul>
-      `;
 
-      category.items.forEach(item => {
-        const qty = this.cart.getQuantity(item.id);
-        const badgeHtml = item.badge ? `<span class="badge ${item.badge.toLowerCase() === 'especial' ? 'special' : ''}">${item.badge}</span>` : '';
-        
-        html += `
-          <li class="menu-item" data-id="${item.id}">
-            <div class="item-info">
-              <span class="item-name">${item.name} ${badgeHtml}</span>
-              <span class="price">R$ ${item.price.toFixed(2).replace('.', ',')}</span>
-            </div>
-            <div class="item-controls">
-              <button class="ctrl-btn minus" data-id="${item.id}" ${qty === 0 ? 'disabled' : ''}>-</button>
-              <span class="qty-display" id="qty-${item.id}">${qty}</span>
-              <button class="ctrl-btn plus" data-id="${item.id}">+</button>
-            </div>
-          </li>
-        `;
-      });
+    const categoryCards = menuData.map(cat => `
+      <a href="#${cat.id}" class="category-card" data-route="${cat.id}" aria-label="${cat.title}">
+        <span class="cat-icon">${CATEGORY_ICONS[cat.id] || '🍽️'}</span>
+        <span class="cat-title">${cat.title}</span>
+      </a>
+    `).join('');
 
-      html += `</ul>`;
-      section.innerHTML = html;
-      this.menuContainer.appendChild(section);
-    });
+    this.menuContainer.innerHTML = `
+      <div class="home-hero">
+        <img class="home-logo" src="assets/images/logo.png" alt="Logo da Delícias da Cris" decoding="async" />
+        <h1 class="home-title">Delícias da Cris</h1>
+        <p class="home-subtitle">CARDÁPIO DIGITAL</p>
+      </div>
 
-    this.attachMenuControls();
+      <div class="home-info">
+        <div class="info-item">
+          <span class="info-dot"></span>
+          Aceitamos encomendas
+        </div>
+        <div class="info-item">
+          <span class="info-dot"></span>
+          Entregas ou retirada na loja (taxa a combinar)
+        </div>
+      </div>
+
+      <div class="category-grid">
+        ${categoryCards}
+      </div>
+
+      <footer class="home-footer">
+        <div class="brand">Delícias da Cris</div>
+        <div class="meta">
+          <a href="https://instagram.com/Delicias_da_CrisXx" target="_blank" rel="noopener noreferrer" aria-label="Instagram">@Delicias_da_CrisXx</a>
+          <a href="tel:+5571988080613" aria-label="Ligar">(71) 98808-0613</a>
+          <address style="all:unset;">Rua José Cardoso dos Santos, 39</address>
+        </div>
+        <a class="cta" href="https://wa.me/5571988080613" target="_blank" rel="noopener noreferrer" aria-label="Pedir pelo WhatsApp">
+          Peça pelo WhatsApp 💬
+        </a>
+      </footer>
+    `;
   }
 
-  attachMenuControls() {
-    const plusBtns = this.menuContainer.querySelectorAll('.plus');
-    const minusBtns = this.menuContainer.querySelectorAll('.minus');
+  // ─── Category Screen ───────────────────────────────────────
+  renderCategory(category) {
+    if (!this.menuContainer) return;
 
-    plusBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const id = e.target.getAttribute('data-id');
-        const itemData = this.findItemData(id);
-        if (itemData) this.cart.addItem(itemData);
-      });
-    });
+    const icon = CATEGORY_ICONS[category.id] || '🍽️';
+    const itemsHTML = category.items.map(item => this.renderItem(item)).join('');
 
-    minusBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const id = e.target.getAttribute('data-id');
-        this.cart.removeItem(id);
-      });
+    this.menuContainer.innerHTML = `
+      <div class="category-page-header">
+        <span class="category-page-icon" aria-hidden="true">${icon}</span>
+        <div>
+          <h1 class="category-page-title">${category.title}</h1>
+          <p class="category-page-count">${category.items.length} itens disponíveis</p>
+        </div>
+      </div>
+      <div class="menu-section">
+        <ul id="menu-list">
+          ${itemsHTML}
+        </ul>
+      </div>
+    `;
+
+    this.attachItemControls();
+  }
+
+  renderItem(item) {
+    const qty = this.cart.getQuantity(item.id);
+    const subtotal = qty > 0 ? `R$ ${(item.price * qty).toFixed(2).replace('.', ',')} (${qty} un.)` : '';
+    const badgeHtml = item.badge
+      ? `<span class="badge ${item.badge.toLowerCase() === 'especial' ? 'special' : ''}">${item.badge}</span>`
+      : '';
+
+    return `
+      <li class="menu-item" data-id="${item.id}">
+        <div class="item-top">
+          <span class="item-name">${item.name}${badgeHtml}</span>
+          <div style="text-align:right;">
+            <span class="item-unit-price">R$ ${item.price.toFixed(2).replace('.', ',')}</span>
+            <div class="item-subtotal ${qty > 0 ? 'has-items' : ''}" id="subtotal-${item.id}">
+              ${subtotal}
+            </div>
+          </div>
+        </div>
+        <div class="controls-wrapper">
+          <div class="main-controls">
+            <button class="ctrl-btn minus" data-id="${item.id}" aria-label="Remover 1" ${qty === 0 ? 'disabled' : ''}>−</button>
+            <span class="qty-display" id="qty-${item.id}">${qty}</span>
+            <button class="ctrl-btn plus" data-id="${item.id}" aria-label="Adicionar 1">+</button>
+          </div>
+          <div class="quick-controls">
+            <div class="quick-group">
+              <button class="quick-btn quick-plus" data-id="${item.id}" data-qty="10" aria-label="Adicionar 10">+10</button>
+              <button class="quick-btn quick-plus" data-id="${item.id}" data-qty="25" aria-label="Adicionar 25">+25</button>
+              <button class="quick-btn quick-plus" data-id="${item.id}" data-qty="50" aria-label="Adicionar 50">+50</button>
+              <button class="quick-btn quick-plus" data-id="${item.id}" data-qty="100" aria-label="Adicionar 100">+100</button>
+            </div>
+            <div class="quick-group">
+              <button class="quick-btn quick-minus" data-id="${item.id}" data-qty="10" aria-label="Remover 10" ${qty === 0 ? 'disabled' : ''}>-10</button>
+              <button class="quick-btn quick-minus" data-id="${item.id}" data-qty="25" aria-label="Remover 25" ${qty === 0 ? 'disabled' : ''}>-25</button>
+              <button class="quick-btn quick-minus" data-id="${item.id}" data-qty="50" aria-label="Remover 50" ${qty === 0 ? 'disabled' : ''}>-50</button>
+              <button class="quick-btn quick-minus" data-id="${item.id}" data-qty="100" aria-label="Remover 100" ${qty === 0 ? 'disabled' : ''}>-100</button>
+            </div>
+          </div>
+        </div>
+      </li>
+    `;
+  }
+
+  attachItemControls() {
+    if (!this.menuContainer) return;
+
+    this.menuContainer.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-id]');
+      if (!btn) return;
+
+      const id = btn.dataset.id;
+      const itemData = this.findItemData(id);
+
+      if (btn.classList.contains('plus')) {
+        if (itemData) this.cart.addItem(itemData, 1);
+      } else if (btn.classList.contains('minus')) {
+        this.cart.removeItem(id, 1);
+      } else if (btn.classList.contains('quick-plus')) {
+        const qty = parseInt(btn.dataset.qty, 10);
+        if (itemData) this.cart.addItem(itemData, qty);
+      } else if (btn.classList.contains('quick-minus')) {
+        const qty = parseInt(btn.dataset.qty, 10);
+        this.cart.removeItem(id, qty);
+      }
     });
   }
 
@@ -110,128 +208,145 @@ export class UI {
     return null;
   }
 
-  setupEventListeners() {
-    if (this.cartFab) {
-      this.cartFab.addEventListener('click', () => {
-        this.cartModal.classList.add('active');
-        document.body.style.overflow = 'hidden'; // Prevent background scrolling
-      });
-    }
+  // ─── Cart UI ───────────────────────────────────────────────
+  onCartUpdate(updatedCart) {
+    this.updateCartUI(updatedCart);
+    this.refreshItemQuantities(updatedCart);
+  }
 
-    if (this.closeCartBtn) {
-      this.closeCartBtn.addEventListener('click', () => {
-        this.cartModal.classList.remove('active');
-        document.body.style.overflow = '';
-      });
-    }
+  refreshItemQuantities(updatedCart) {
+    // Update only visible qty displays and subtotals — no full re-render
+    menuData.forEach(cat => {
+      cat.items.forEach(item => {
+        const qtyEl = document.getElementById(`qty-${item.id}`);
+        const subtotalEl = document.getElementById(`subtotal-${item.id}`);
+        const minusBtn = this.menuContainer?.querySelector(`.minus[data-id="${item.id}"]`);
+        const quickMinusBtns = this.menuContainer?.querySelectorAll(`.quick-minus[data-id="${item.id}"]`);
 
-    if (this.clearCartBtn) {
-      this.clearCartBtn.addEventListener('click', () => {
-        if(confirm('Tem certeza que deseja limpar o carrinho?')) {
-          this.cart.clear();
+        const qty = updatedCart.getQuantity(item.id);
+
+        if (qtyEl) qtyEl.textContent = qty;
+
+        if (subtotalEl) {
+          if (qty > 0) {
+            subtotalEl.textContent = `R$ ${(item.price * qty).toFixed(2).replace('.', ',')} (${qty} un.)`;
+            subtotalEl.className = 'item-subtotal has-items';
+          } else {
+            subtotalEl.textContent = '';
+            subtotalEl.className = 'item-subtotal';
+          }
         }
-      });
-    }
 
-    if (this.checkoutBtn) {
-      this.checkoutBtn.addEventListener('click', () => {
-        const link = generateWhatsAppLink(this.cart);
-        window.open(link, '_blank');
+        if (minusBtn) minusBtn.disabled = qty === 0;
+        quickMinusBtns?.forEach(btn => btn.disabled = qty === 0);
       });
-    }
-    
-    // Close modal when clicking outside content
-    if(this.cartModal) {
-      this.cartModal.addEventListener('click', (e) => {
-        if (e.target === this.cartModal) {
-          this.cartModal.classList.remove('active');
-          document.body.style.overflow = '';
-        }
-      });
-    }
+    });
   }
 
   updateCartUI(updatedCart) {
     const totalItems = updatedCart.getTotalItems();
-    
-    // Update badge and fab visibility
-    if (this.cartBadge) {
-      this.cartBadge.textContent = totalItems;
-      if (totalItems > 0) {
-        this.cartFab.classList.add('visible');
-      } else {
-        this.cartFab.classList.remove('visible');
-      }
-    }
 
-    // Update quantities in the menu
-    updatedCart.getItems().forEach(item => {
-      const qtyEl = document.getElementById(`qty-${item.id}`);
-      if (qtyEl) {
-        qtyEl.textContent = item.quantity;
-      }
-      const minusBtn = document.querySelector(`.minus[data-id="${item.id}"]`);
-      if (minusBtn) {
-        minusBtn.disabled = item.quantity === 0;
-      }
-    });
+    // Badge
+    if (this.cartBadge) this.cartBadge.textContent = totalItems;
 
-    // Reset quantities in the menu for items not in cart anymore
-    menuData.forEach(cat => cat.items.forEach(item => {
-      if(updatedCart.getQuantity(item.id) === 0) {
-        const qtyEl = document.getElementById(`qty-${item.id}`);
-        if(qtyEl) qtyEl.textContent = '0';
-        const minusBtn = document.querySelector(`.minus[data-id="${item.id}"]`);
-        if(minusBtn) minusBtn.disabled = true;
-      }
-    }));
-
-    // Render cart items in modal
+    // Cart items list
     if (this.cartItemsList) {
       this.cartItemsList.innerHTML = '';
       const items = updatedCart.getItems();
-      
+
       if (items.length === 0) {
-        this.cartItemsList.innerHTML = '<p class="empty-cart-msg">Seu carrinho está vazio.</p>';
-        this.checkoutBtn.disabled = true;
+        this.cartItemsList.innerHTML = `
+          <li class="empty-cart-msg">
+            <span class="empty-icon">🛒</span>
+            Seu carrinho está vazio.<br>Selecione itens do cardápio!
+          </li>`;
+        if (this.checkoutBtn) this.checkoutBtn.disabled = true;
       } else {
-        this.checkoutBtn.disabled = false;
+        if (this.checkoutBtn) this.checkoutBtn.disabled = false;
+
         items.forEach(item => {
           const li = document.createElement('li');
           li.className = 'cart-item';
           li.innerHTML = `
             <div class="cart-item-info">
-              <span class="cart-item-name">${item.name}</span>
-              <span class="cart-item-price">R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}</span>
+              <div class="cart-item-name">${item.name}</div>
+              <div class="cart-item-detail">R$ ${item.price.toFixed(2).replace('.', ',')} × ${item.quantity}</div>
             </div>
-            <div class="item-controls cart-controls">
-              <button class="ctrl-btn minus" data-id="${item.id}">-</button>
-              <span class="qty-display">${item.quantity}</span>
-              <button class="ctrl-btn plus" data-id="${item.id}">+</button>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="cart-item-controls">
+                <button class="cart-ctrl-btn cart-minus" data-id="${item.id}" aria-label="Remover 1">−</button>
+                <span class="cart-qty">${item.quantity}</span>
+                <button class="cart-ctrl-btn cart-plus" data-id="${item.id}" aria-label="Adicionar 1">+</button>
+              </div>
+              <span class="cart-item-price">R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}</span>
             </div>
           `;
           this.cartItemsList.appendChild(li);
         });
-
-        // Attach events inside cart
-        this.cartItemsList.querySelectorAll('.plus').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            const id = e.target.getAttribute('data-id');
-            const itemData = this.findItemData(id);
-            if(itemData) this.cart.addItem(itemData);
-          });
-        });
-        this.cartItemsList.querySelectorAll('.minus').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            const id = e.target.getAttribute('data-id');
-            this.cart.removeItem(id);
-          });
-        });
       }
     }
 
+    // Total
     if (this.cartTotalEl) {
       this.cartTotalEl.textContent = `R$ ${updatedCart.getTotalPrice().toFixed(2).replace('.', ',')}`;
     }
+  }
+
+  // ─── Global Event Listeners ────────────────────────────────
+  setupGlobalListeners() {
+    // Hash-based routing
+    window.addEventListener('hashchange', () => this.render());
+
+    // Cart fab
+    this.cartFab?.addEventListener('click', () => this.openCart());
+
+    // Close cart
+    this.closeCartBtn?.addEventListener('click', () => this.closeCart());
+
+    // Close on backdrop click
+    this.cartModal?.addEventListener('click', (e) => {
+      if (e.target === this.cartModal) this.closeCart();
+    });
+
+    // Clear cart
+    this.clearCartBtn?.addEventListener('click', () => {
+      if (confirm('Tem certeza que deseja limpar o carrinho?')) {
+        this.cart.clear();
+      }
+    });
+
+    // Checkout
+    this.checkoutBtn?.addEventListener('click', () => {
+      const link = generateWhatsAppLink(this.cart);
+      window.open(link, '_blank');
+    });
+
+    // Cart item controls (delegated on modal)
+    this.cartItemsList?.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-id]');
+      if (!btn) return;
+      const id = btn.dataset.id;
+      if (btn.classList.contains('cart-plus')) {
+        const itemData = this.findItemData(id);
+        if (itemData) this.cart.addItem(itemData, 1);
+      } else if (btn.classList.contains('cart-minus')) {
+        this.cart.removeItem(id, 1);
+      }
+    });
+
+    // ESC to close cart
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') this.closeCart();
+    });
+  }
+
+  openCart() {
+    this.cartModal?.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeCart() {
+    this.cartModal?.classList.remove('active');
+    document.body.style.overflow = '';
   }
 }

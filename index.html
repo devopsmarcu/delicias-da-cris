@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8" />
-  <title>Centro Salgados | Tabela de Preços</title>
+  <title>Delícias da Cris | Cardápio Digital</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#ff887d" />
-  <meta name="description"
-    content="Tabela de preços dos salgados da Delícias da Cris. Encomendas, entregas e retirada na loja." />
+  <meta name="description" content="Cardápio digital da Delícias da Cris. Monte seu pedido e envie pelo WhatsApp." />
   <meta name="color-scheme" content="light" />
-  <meta property="og:title" content="Delícias da Cris — Tabela de Preços" />
-  <meta property="og:description" content="Confira os salgados simples e especiais, e peça pelo WhatsApp." />
+  <meta property="og:title" content="Delícias da Cris — Cardápio Digital" />
+  <meta property="og:description" content="Monte seu pedido com salgados, tortas, bolos e pães. Finalize pelo WhatsApp!" />
   <meta property="og:type" content="website" />
   <link rel="preload" as="image" href="assets/images/logo.png" />
   <link rel="stylesheet" href="assets/styles/main.css" />
@@ -19,72 +17,81 @@
 
 <body>
 
-  <main>
-    <div class="menu-card">
-      <div class="menu-hero">
-        <img class="brand-logo" src="assets/images/logo.png" alt="Logo da Delícias da Cris" decoding="async" />
-        <p class="menu-subtitle">Cardapio</p>
-        <h1 class="menu-title">Delícias da Cris</h1>
-        <p class="menu-subtitle">TABELA DE PREÇOS</p>
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <img class="header-logo" src="assets/images/logo.png" alt="Logo Delícias da Cris" decoding="async" />
+      <div class="header-text">
+        <span class="header-brand">Delícias da Cris</span>
+        <span id="header-category" class="header-category">Cardápio</span>
       </div>
+      <button id="cart-fab" class="cart-fab" aria-label="Abrir carrinho">
+        🛒 <span id="cart-badge" class="cart-badge">0</span>
+      </button>
+    </div>
+  </header>
 
-      <nav id="category-nav" class="category-nav" aria-label="Categorias do Cardápio"></nav>
-
-      <div id="menu-container">
-        <!-- Itens injetados via JavaScript -->
-      </div>
-
-      <div class="info">
-        <div class="info-grid">
-          <div class="info-item"><span class="info-dot"></span> Aceitamos encomendas</div>
-          <div class="info-item"><span class="info-dot"></span> Entregas ou retirada na loja (taxa a combinar)</div>
-        </div>
-      </div>
-
-      <div class="footer">
-        <div class="brand">Delícias da Cris</div>
-        <div class="meta">
-          <span><a href="https://instagram.com/Delicias_da_CrisXx" target="_blank" rel="noopener noreferrer"
-              aria-label="Instagram @Delicias_da_CrisXx"
-              style="color: inherit; text-decoration: underline;">@Delicias_da_CrisXx</a></span>
-          <span><a href="tel:+5571988080613" style="color: inherit; text-decoration: underline;"
-              aria-label="Ligar para (71) 98808-0613">(71) 98808-0613</a></span>
-          <address style="all: unset;">Rua José Cardoso dos Santos, 39</address>
-        </div>
-        <a class="cta" href="https://wa.me/5571988080613" target="_blank" rel="noopener noreferrer"
-          aria-label="Pedir pelo WhatsApp">Peça pelo WhatsApp</a>
-      </div>
+  <!-- Main Content -->
+  <main id="main-content">
+    <div id="menu-container" class="menu-container">
+      <!-- Rendered by JS -->
     </div>
   </main>
 
-  <!-- Cart FAB -->
-  <button id="cart-fab" class="cart-fab" aria-label="Abrir carrinho">
-    🛒 <span id="cart-badge" class="cart-badge">0</span>
-  </button>
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav" id="bottom-nav" aria-label="Categorias do cardápio">
+    <a href="#home" class="nav-item" data-route="home">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Início</span>
+    </a>
+    <a href="#simples" class="nav-item" data-route="simples">
+      <span class="nav-icon">🥟</span>
+      <span class="nav-label">Simples</span>
+    </a>
+    <a href="#especiais" class="nav-item" data-route="especiais">
+      <span class="nav-icon">⭐</span>
+      <span class="nav-label">Especiais</span>
+    </a>
+    <a href="#tortas-salgadas" class="nav-item" data-route="tortas-salgadas">
+      <span class="nav-icon">🥧</span>
+      <span class="nav-label">Tortas</span>
+    </a>
+    <a href="#bolos-simples" class="nav-item" data-route="bolos-simples">
+      <span class="nav-icon">🍰</span>
+      <span class="nav-label">Bolos S.</span>
+    </a>
+    <a href="#bolos-cobertura" class="nav-item" data-route="bolos-cobertura">
+      <span class="nav-icon">🎂</span>
+      <span class="nav-label">Bolos C.</span>
+    </a>
+    <a href="#paes-forno" class="nav-item" data-route="paes-forno">
+      <span class="nav-icon">🍞</span>
+      <span class="nav-label">Pães</span>
+    </a>
+  </nav>
 
-  <!-- Cart Modal -->
-  <div id="cart-modal" class="cart-modal">
+  <!-- Cart Drawer -->
+  <div id="cart-modal" class="cart-modal" role="dialog" aria-modal="true" aria-label="Carrinho de pedido">
     <div class="cart-content">
       <div class="cart-header">
-        <h2>Seu Pedido</h2>
+        <h2>🛒 Seu Pedido</h2>
         <button id="close-cart-btn" class="close-btn" aria-label="Fechar carrinho">&times;</button>
       </div>
-      <ul id="cart-items-list" class="cart-items-list">
-        <!-- Itens do carrinho -->
+      <ul id="cart-items-list" class="cart-items-list" aria-live="polite">
+        <!-- Rendered by JS -->
       </ul>
       <div class="cart-footer">
-        <div class="cart-total">
-          <span>Total:</span>
-          <span id="cart-total">R$ 0,00</span>
+        <div class="cart-total-row">
+          <span>Total do pedido:</span>
+          <span id="cart-total" class="cart-total-value">R$ 0,00</span>
         </div>
         <div class="cart-actions">
           <button id="clear-cart-btn" class="clear-btn">Limpar</button>
-          <button id="checkout-btn" class="checkout-btn">Finalizar Pedido 📱</button>
+          <button id="checkout-btn" class="checkout-btn">Finalizar via WhatsApp 📱</button>
         </div>
       </div>
     </div>
   </div>
 
 </body>
-
 </html>

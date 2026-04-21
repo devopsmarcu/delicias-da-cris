@@ -23,22 +23,22 @@ export class Cart {
     localStorage.setItem('delicias_cart', JSON.stringify(cartArray));
   }
 
-  addItem(itemData) {
+  addItem(itemData, quantity = 1) {
     if (this.items.has(itemData.id)) {
       const item = this.items.get(itemData.id);
-      item.quantity += 1;
+      item.quantity += quantity;
     } else {
-      this.items.set(itemData.id, { ...itemData, quantity: 1 });
+      this.items.set(itemData.id, { ...itemData, quantity: quantity });
     }
     this.saveToStorage();
     this.triggerUpdate();
   }
 
-  removeItem(itemId) {
+  removeItem(itemId, quantity = 1) {
     if (this.items.has(itemId)) {
       const item = this.items.get(itemId);
-      if (item.quantity > 1) {
-        item.quantity -= 1;
+      if (item.quantity > quantity) {
+        item.quantity -= quantity;
       } else {
         this.items.delete(itemId);
       }
