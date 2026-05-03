@@ -40,9 +40,12 @@ export const menuData = [
     id: "tortas-salgadas",
     title: "Tortas Salgadas",
     items: [
-      { id: "t1", name: "Torta de Frango com Catupiry", price: 80.00, badge: null },
-      { id: "t2", name: "Torta de Camarão", price: 120.00, badge: "Premium" },
-      { id: "t3", name: "Torta de Bacalhau", price: 130.00, badge: "Premium" }
+      { id: "t1", name: "Torta de Frango com Catupiry P", price: 65.00, badge: null },
+      { id: "t2", name: "Torta de Frango com Catupiry M", price: 85.00, badge: null },
+      { id: "t3", name: "Torta de Sertanejo P", price: 100.00, badge: "Premium" },
+      { id: "t4", name: "Torta de Sertanejo M", price: 135.00, badge: "Premium" },
+      { id: "t3", name: "Torta de Camarão P", price: 150.00, badge: "Premium" },
+      { id: "t4", name: "Torta de Camarão M", price: 190.00, badge: "Premium" }
     ]
   },
   {
