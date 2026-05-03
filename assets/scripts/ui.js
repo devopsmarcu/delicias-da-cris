@@ -5,9 +5,7 @@ const CATEGORY_ICONS = {
   'simples': '🥟',
   'especiais': '⭐',
   'tortas-salgadas': '🥧',
-  'bolos-simples': '🍰',
-  'bolos-cobertura': '🎂',
-  'paes-forno': '🍞',
+  'bolos-simples': '🍰'
 };
 
 export class UI {

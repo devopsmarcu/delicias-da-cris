@@ -58,14 +58,5 @@ export const menuData = [
       { id: "bs4", name: "Bolo Vulcão (G - 24cm)", price: 65.00, badge: "Premium", flavors: ["Laranja", "Coco", "Mesclado", "Chocolate", "Formigueiro", "Milho"] },
       { id: "bs5", name: "Torta de Abacaxi (M - 20cm)", price: 50.00, badge: "Especial", flavors: ["Laranja", "Coco", "Mesclado", "Chocolate", "Formigueiro", "Milho"] }
     ]
-  },
-  {
-    id: "bolos-cobertura",
-    title: "Bolos com Cobertura",
-    items: [
-      { id: "bc1", name: "Bolo Vulcão de Chocolate", price: 70.00, badge: "Especial" },
-      { id: "bc2", name: "Bolo de Cenoura com Brigadeiro", price: 65.00, badge: null },
-      { id: "bc3", name: "Bolo Red Velvet", price: 90.00, badge: "Premium" }
-    ]
   }
 ];

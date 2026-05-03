@@ -39,8 +39,6 @@ Aplicação de **cardápio digital com sistema de pedidos** para a "Delícias da
 | `#especiais` | Salgados Especiais |
 | `#tortas-salgadas` | Tortas Salgadas |
 | `#bolos-simples` | Bolos Simples |
-| `#bolos-cobertura` | Bolos com Cobertura |
-| `#paes-forno` | Pães de Forno |
 
 A navegação é tratada via `window.location.hash` + evento `hashchange`. A bottom navigation destaca a categoria ativa automaticamente.
 
