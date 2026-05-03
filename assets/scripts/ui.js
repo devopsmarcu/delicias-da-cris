@@ -101,9 +101,6 @@ export class UI {
           <a href="tel:+5571988080613" aria-label="Ligar">(71) 98808-0613</a>
           <address style="all:unset;">Rua José Cardoso dos Santos, 39</address>
         </div>
-        <a class="cta" href="https://wa.me/5571988080613" target="_blank" rel="noopener noreferrer" aria-label="Pedir pelo WhatsApp">
-          Peça pelo WhatsApp 💬
-        </a>
       </footer>
     `;
   }
