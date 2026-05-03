@@ -134,7 +134,17 @@ export class UI {
   }
 
   renderItem(item) {
-    const qty = this.cart.getQuantity(item.id);
+    const hasFlavors = item.flavors && item.flavors.length > 0;
+    let flavorHtml = '';
+    let currentCartId = item.id;
+
+    if (hasFlavors) {
+      currentCartId = `${item.id}|${item.flavors[0]}`;
+      const options = item.flavors.map(f => `<option value="${f}">${f}</option>`).join('');
+      flavorHtml = `<select class="flavor-select" data-id="${item.id}" aria-label="Sabor de ${item.name}">${options}</select>`;
+    }
+
+    const qty = this.cart.getQuantity(currentCartId);
     const subtotal = qty > 0 ? `R$ ${(item.price * qty).toFixed(2).replace('.', ',')} (${qty} un.)` : '';
     const badgeHtml = item.badge
       ? `<span class="badge ${item.badge.toLowerCase() === 'especial' ? 'special' : ''}">${item.badge}</span>`
@@ -143,7 +153,10 @@ export class UI {
     return `
       <li class="menu-item" data-id="${item.id}">
         <div class="item-top">
-          <span class="item-name">${item.name}${badgeHtml}</span>
+          <div class="item-title-wrapper">
+            <span class="item-name">${item.name}${badgeHtml}</span>
+            ${flavorHtml}
+          </div>
           <div style="text-align:right;">
             <span class="item-unit-price">R$ ${item.price.toFixed(2).replace('.', ',')}</span>
             <div class="item-subtotal ${qty > 0 ? 'has-items' : ''}" id="subtotal-${item.id}">
@@ -198,38 +211,79 @@ export class UI {
       const btn = e.target.closest('button[data-id]');
       if (!btn) return;
 
-      const id = btn.dataset.id;
-      const itemData = this.findItemData(id);
+      const baseId = btn.dataset.id;
+      const baseItemData = this.findItemData(baseId);
+      if (!baseItemData) return;
+
+      let cartId = baseId;
+      let itemDataToCart = baseItemData;
+
+      if (baseItemData.flavors && baseItemData.flavors.length > 0) {
+        const selectEl = this.menuContainer.querySelector(`select.flavor-select[data-id="${baseId}"]`);
+        if (selectEl) {
+          const flavor = selectEl.value;
+          cartId = `${baseId}|${flavor}`;
+          itemDataToCart = {
+            ...baseItemData,
+            id: cartId,
+            name: `${baseItemData.name} - ${flavor}`
+          };
+        }
+      }
 
       if (btn.classList.contains('plus')) {
-        if (itemData) this.cart.addItem(itemData, 1);
+        this.cart.addItem(itemDataToCart, 1);
       } else if (btn.classList.contains('minus')) {
-        this.cart.removeItem(id, 1);
+        this.cart.removeItem(cartId, 1);
       } else if (btn.classList.contains('quick-plus')) {
         const qty = parseInt(btn.dataset.qty, 10);
-        if (itemData) this.cart.addItem(itemData, qty);
+        this.cart.addItem(itemDataToCart, qty);
       } else if (btn.classList.contains('quick-minus')) {
         const qty = parseInt(btn.dataset.qty, 10);
-        this.cart.removeItem(id, qty);
+        this.cart.removeItem(cartId, qty);
       }
     }, { signal });
 
     // Manual input: 'change' fires on blur or Enter
     this.menuContainer.addEventListener('change', (e) => {
+      if (e.target.classList.contains('flavor-select')) {
+        // Flavor changed, refresh the controls for this item
+        this.refreshItemQuantities(this.cart);
+        return;
+      }
+
       const input = e.target.closest('input.qty-input[data-id]');
       if (!input) return;
 
-      const id = input.dataset.id;
-      const itemData = this.findItemData(id);
+      const baseId = input.dataset.id;
+      const baseItemData = this.findItemData(baseId);
+      if (!baseItemData) return;
+
+      let cartId = baseId;
+      let itemDataToCart = baseItemData;
+
+      if (baseItemData.flavors && baseItemData.flavors.length > 0) {
+        const selectEl = this.menuContainer.querySelector(`select.flavor-select[data-id="${baseId}"]`);
+        if (selectEl) {
+          const flavor = selectEl.value;
+          cartId = `${baseId}|${flavor}`;
+          itemDataToCart = {
+            ...baseItemData,
+            id: cartId,
+            name: `${baseItemData.name} - ${flavor}`
+          };
+        }
+      }
+
       const newQty = parseInt(input.value, 10);
 
       if (isNaN(newQty) || newQty < 0) {
         // Reset to current cart value if invalid
-        input.value = this.cart.getQuantity(id);
+        input.value = this.cart.getQuantity(cartId);
         return;
       }
 
-      this.cart.setQuantity(id, newQty, itemData);
+      this.cart.setQuantity(cartId, newQty, itemDataToCart);
     }, { signal });
   }
 
@@ -256,10 +310,20 @@ export class UI {
         const minusBtn = this.menuContainer?.querySelector(`.minus[data-id="${item.id}"]`);
         const quickMinusBtns = this.menuContainer?.querySelectorAll(`.quick-minus[data-id="${item.id}"]`);
 
-        const qty = updatedCart.getQuantity(item.id);
+        if (!qtyInput) return; // Se o input não existe, pula este item
+
+        let currentCartId = item.id;
+        if (item.flavors && item.flavors.length > 0) {
+          const selectEl = this.menuContainer?.querySelector(`select.flavor-select[data-id="${item.id}"]`);
+          if (selectEl) {
+            currentCartId = `${item.id}|${selectEl.value}`;
+          }
+        }
+
+        const qty = updatedCart.getQuantity(currentCartId);
 
         // Only update the input if the user isn't actively typing in it
-        if (qtyInput && document.activeElement !== qtyInput) {
+        if (document.activeElement !== qtyInput) {
           qtyInput.value = qty;
         }
 

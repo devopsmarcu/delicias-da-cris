@@ -353,12 +353,37 @@ img { display: block; }
   gap: 12px;
 }
 
+.item-title-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
 .item-name {
   font-weight: 700;
   font-size: 1rem;
   color: var(--text);
-  flex: 1;
   line-height: 1.35;
+}
+
+.flavor-select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--cream);
+  color: var(--brand-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  outline: none;
+  font-family: inherit;
+  cursor: pointer;
+  max-width: 100%;
+}
+
+.flavor-select:focus {
+  border-color: var(--brand-primary);
 }
 
 .item-unit-price {

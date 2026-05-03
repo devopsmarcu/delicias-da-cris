@@ -44,17 +44,19 @@ export const menuData = [
       { id: "t2", name: "Torta de Frango com Catupiry M", price: 85.00, badge: null },
       { id: "t3", name: "Torta de Sertanejo P", price: 100.00, badge: "Premium" },
       { id: "t4", name: "Torta de Sertanejo M", price: 135.00, badge: "Premium" },
-      { id: "t3", name: "Torta de Camarão P", price: 150.00, badge: "Premium" },
-      { id: "t4", name: "Torta de Camarão M", price: 190.00, badge: "Premium" }
+      { id: "t5", name: "Torta de Camarão P", price: 150.00, badge: "Premium" },
+      { id: "t6", name: "Torta de Camarão M", price: 190.00, badge: "Premium" }
     ]
   },
   {
     id: "bolos-simples",
     title: "Bolos Simples",
     items: [
-      { id: "bs1", name: "Bolo de Cenoura", price: 40.00, badge: null },
-      { id: "bs2", name: "Bolo de Chocolate", price: 45.00, badge: null },
-      { id: "bs3", name: "Bolo de Laranja", price: 35.00, badge: null }
+      { id: "bs1", name: "Bolo Caseiro (M - 20cm)", price: 20.00, badge: null, flavors: ["Laranja", "Coco", "Mesclado", "Chocolate", "Formigueiro", "Milho"] },
+      { id: "bs2", name: "Bolo Caseiro (G - 24cm)", price: 25.00, badge: null, flavors: ["Laranja", "Coco", "Mesclado", "Chocolate", "Formigueiro", "Milho"] },
+      { id: "bs3", name: "Bolo Vulcão (M - 20cm)", price: 50.00, badge: "Premium", flavors: ["Laranja", "Coco", "Mesclado", "Chocolate", "Formigueiro", "Milho"] },
+      { id: "bs4", name: "Bolo Vulcão (G - 24cm)", price: 65.00, badge: "Premium", flavors: ["Laranja", "Coco", "Mesclado", "Chocolate", "Formigueiro", "Milho"] },
+      { id: "bs5", name: "Torta de Abacaxi (M - 20cm)", price: 50.00, badge: "Especial", flavors: ["Laranja", "Coco", "Mesclado", "Chocolate", "Formigueiro", "Milho"] }
     ]
   },
   {
@@ -64,15 +66,6 @@ export const menuData = [
       { id: "bc1", name: "Bolo Vulcão de Chocolate", price: 70.00, badge: "Especial" },
       { id: "bc2", name: "Bolo de Cenoura com Brigadeiro", price: 65.00, badge: null },
       { id: "bc3", name: "Bolo Red Velvet", price: 90.00, badge: "Premium" }
-    ]
-  },
-  {
-    id: "paes-forno",
-    title: "Pães de Forno",
-    items: [
-      { id: "p1", name: "Pãozinho Delícia Tradicional", price: 0.60, badge: null },
-      { id: "p2", name: "Pãozinho Delícia com Queijo", price: 0.75, badge: null },
-      { id: "p3", name: "Pãozinho de Batata Recheado", price: 0.80, badge: null }
     ]
   }
 ];
