@@ -2,10 +2,10 @@ import { menuData } from './menu.js';
 import { generateWhatsAppLink } from './whatsapp.js';
 
 const CATEGORY_ICONS = {
-  'simples': '🥟',
-  'especiais': '⭐',
-  'tortas-salgadas': '🥧',
-  'bolos-simples': '🍰'
+  'simples': '<i data-lucide="chef-hat"></i>',
+  'especiais': '<i data-lucide="star"></i>',
+  'tortas-salgadas': '<i data-lucide="pie-chart"></i>',
+  'bolos-simples': '<i data-lucide="cake"></i>'
 };
 
 export class UI {
@@ -51,6 +51,10 @@ export class UI {
         if (this.headerCategory) this.headerCategory.textContent = 'Cardápio';
       }
     }
+    
+    if (typeof window.lucide !== 'undefined') {
+      window.lucide.createIcons();
+    }
   }
 
   updateActiveNav(route) {
@@ -65,7 +69,7 @@ export class UI {
 
     const categoryCards = menuData.map(cat => `
       <a href="#${cat.id}" class="category-card" data-route="${cat.id}" aria-label="${cat.title}">
-        <span class="cat-icon">${CATEGORY_ICONS[cat.id] || '🍽️'}</span>
+        <span class="cat-icon">${CATEGORY_ICONS[cat.id] || '<i data-lucide="utensils"></i>'}</span>
         <span class="cat-title">${cat.title}</span>
       </a>
     `).join('');
@@ -107,7 +111,7 @@ export class UI {
   renderCategory(category) {
     if (!this.menuContainer) return;
 
-    const icon = CATEGORY_ICONS[category.id] || '🍽️';
+    const icon = CATEGORY_ICONS[category.id] || '<i data-lucide="utensils"></i>';
     const itemsHTML = category.items.map(item => this.renderItem(item)).join('');
 
     this.menuContainer.innerHTML = `
@@ -161,7 +165,7 @@ export class UI {
         </div>
         <div class="controls-wrapper">
           <div class="main-controls">
-            <button class="ctrl-btn minus" data-id="${item.id}" aria-label="Remover 1" ${qty === 0 ? 'disabled' : ''}>−</button>
+            <button class="ctrl-btn minus" data-id="${item.id}" aria-label="Remover 1" ${qty === 0 ? 'disabled' : ''}><i data-lucide="minus"></i></button>
             <input
               type="number"
               class="qty-input"
@@ -172,7 +176,7 @@ export class UI {
               inputmode="numeric"
               aria-label="Quantidade de ${item.name}"
             />
-            <button class="ctrl-btn plus" data-id="${item.id}" aria-label="Adicionar 1">+</button>
+            <button class="ctrl-btn plus" data-id="${item.id}" aria-label="Adicionar 1"><i data-lucide="plus"></i></button>
           </div>
           <div class="quick-controls">
             <div class="quick-group">
@@ -352,7 +356,7 @@ export class UI {
       if (items.length === 0) {
         this.cartItemsList.innerHTML = `
           <li class="empty-cart-msg">
-            <span class="empty-icon">🛒</span>
+            <span class="empty-icon"><i data-lucide="shopping-cart"></i></span>
             Seu carrinho está vazio.<br>Selecione itens do cardápio!
           </li>`;
         if (this.checkoutBtn) this.checkoutBtn.disabled = true;
@@ -367,11 +371,11 @@ export class UI {
               <div class="cart-item-name">${item.name}</div>
               <div class="cart-item-detail">R$ ${item.price.toFixed(2).replace('.', ',')} × ${item.quantity}</div>
             </div>
-            <div style="display:flex;align-items:center;gap:10px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
               <div class="cart-item-controls">
-                <button class="cart-ctrl-btn cart-minus" data-id="${item.id}" aria-label="Remover 1">−</button>
+                <button class="cart-ctrl-btn cart-minus" data-id="${item.id}" aria-label="Remover 1"><i data-lucide="minus"></i></button>
                 <span class="cart-qty">${item.quantity}</span>
-                <button class="cart-ctrl-btn cart-plus" data-id="${item.id}" aria-label="Adicionar 1">+</button>
+                <button class="cart-ctrl-btn cart-plus" data-id="${item.id}" aria-label="Adicionar 1"><i data-lucide="plus"></i></button>
               </div>
               <span class="cart-item-price">R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}</span>
             </div>
@@ -384,6 +388,10 @@ export class UI {
     // Total
     if (this.cartTotalEl) {
       this.cartTotalEl.textContent = `R$ ${updatedCart.getTotalPrice().toFixed(2).replace('.', ',')}`;
+    }
+    
+    if (typeof window.lucide !== 'undefined') {
+      window.lucide.createIcons();
     }
   }
 

@@ -10,6 +10,15 @@
   <meta property="og:title" content="Delícias da Cris — Cardápio Digital" />
   <meta property="og:description" content="Monte seu pedido com salgados, tortas, bolos e pães. Finalize pelo WhatsApp!" />
   <meta property="og:type" content="website" />
+  
+  <!-- Fontes modernas -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Ícones Lucide -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <link rel="preload" as="image" href="assets/images/logo.png" />
   <link rel="stylesheet" href="assets/styles/main.css" />
   <script type="module" src="assets/scripts/main.js" defer></script>
@@ -26,7 +35,8 @@
         <span id="header-category" class="header-category">Cardápio</span>
       </div>
       <button id="cart-fab" class="cart-fab" aria-label="Abrir carrinho">
-        🛒 <span id="cart-badge" class="cart-badge">0</span>
+        <i data-lucide="shopping-cart" class="icon-sm"></i>
+        <span id="cart-badge" class="cart-badge">0</span>
       </button>
     </div>
   </header>
@@ -41,23 +51,23 @@
   <!-- Bottom Navigation -->
   <nav class="bottom-nav" id="bottom-nav" aria-label="Categorias do cardápio">
     <a href="#home" class="nav-item" data-route="home">
-      <span class="nav-icon">🏠</span>
+      <span class="nav-icon"><i data-lucide="home"></i></span>
       <span class="nav-label">Início</span>
     </a>
     <a href="#simples" class="nav-item" data-route="simples">
-      <span class="nav-icon">🥟</span>
+      <span class="nav-icon"><i data-lucide="chef-hat"></i></span>
       <span class="nav-label">Simples</span>
     </a>
     <a href="#especiais" class="nav-item" data-route="especiais">
-      <span class="nav-icon">⭐</span>
+      <span class="nav-icon"><i data-lucide="star"></i></span>
       <span class="nav-label">Especiais</span>
     </a>
     <a href="#tortas-salgadas" class="nav-item" data-route="tortas-salgadas">
-      <span class="nav-icon">🥧</span>
+      <span class="nav-icon"><i data-lucide="pie-chart"></i></span>
       <span class="nav-label">Tortas</span>
     </a>
     <a href="#bolos-simples" class="nav-item" data-route="bolos-simples">
-      <span class="nav-icon">🍰</span>
+      <span class="nav-icon"><i data-lucide="cake"></i></span>
       <span class="nav-label">Bolos</span>
     </a>
   </nav>
@@ -66,24 +76,36 @@
   <div id="cart-modal" class="cart-modal" role="dialog" aria-modal="true" aria-label="Carrinho de pedido">
     <div class="cart-content">
       <div class="cart-header">
-        <h2>🛒 Seu Pedido</h2>
-        <button id="close-cart-btn" class="close-btn" aria-label="Fechar carrinho">&times;</button>
+        <h2><i data-lucide="shopping-bag" class="icon-header"></i> Seu Pedido</h2>
+        <button id="close-cart-btn" class="close-btn" aria-label="Fechar carrinho">
+          <i data-lucide="x"></i>
+        </button>
       </div>
       <ul id="cart-items-list" class="cart-items-list" aria-live="polite">
         <!-- Rendered by JS -->
       </ul>
       <div class="cart-footer">
         <div class="cart-total-row">
-          <span>Total do pedido:</span>
+          <span>Total:</span>
           <span id="cart-total" class="cart-total-value">R$ 0,00</span>
         </div>
         <div class="cart-actions">
-          <button id="clear-cart-btn" class="clear-btn">Limpar</button>
-          <button id="checkout-btn" class="checkout-btn">Finalizar via WhatsApp 📱</button>
+          <button id="clear-cart-btn" class="clear-btn" aria-label="Limpar carrinho">
+            <i data-lucide="trash-2"></i>
+          </button>
+          <button id="checkout-btn" class="checkout-btn">
+            Finalizar <i data-lucide="message-circle"></i>
+          </button>
         </div>
       </div>
     </div>
   </div>
 
+  <script>
+    // Inicializar os ícones estáticos na primeira carga
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  </script>
 </body>
 </html>
